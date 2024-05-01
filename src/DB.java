@@ -351,6 +351,25 @@ public class DB {
 		}
 		
 	}
+
+	public static String getUserRole(String username, String password) {
+	    String sql = "SELECT Role FROM users WHERE Username = '"+username+" AND Password = '"+password+"'";
+	    try (Connection conn = DBConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        stmt.setString(1, username);
+	        stmt.setString(2, password);
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                return rs.getString("Role");
+	            } else {
+	                return null; 
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	        return null;
+	    }
+	}
 	public static void main(String args[])
 	{
 	

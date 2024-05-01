@@ -107,44 +107,12 @@ public class Login extends JFrame {
 		});
 		
 		btnLogin = new JButton("Login");
+        btnLogin.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                performLogin();
+            }
+        });
 	
-		btnLogin.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				password=passwordField.getText().toString().toLowerCase();
-				username=usernameField.getText().toString().toLowerCase();
-				passwordField.setText("");
-				usernameField.setText("");
-				if(password.equals("")||username.equals(""))
-					error.setText(errorText);
-				else
-				{
-					error.setText("");
-					if(username.equals("admin"))
-					{
-						if(DB.varifyLogin(username,password))
-							{
-								error.setText("");
-								AdminPanel p=new AdminPanel();
-								p.setVisible(true);
-							}
-						else
-							error.setText(errorText);
-					}
-					else
-					{
-						if(DB.varifyLogin(username,password))
-						{
-							error.setText("");
-							generateInvoice g=new generateInvoice();
-							g.setVisible(true);
-						}
-					else
-						error.setText(errorText);
-					}
-					
-				}
-			}
-		});
 		btnLogin.setBounds(282, 227, 89, 23);
 		contentPane.add(btnLogin);
 		
@@ -165,6 +133,48 @@ public class Login extends JFrame {
 		
 		
 	}
+private void performLogin() {
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword());
+
+        if (username.isEmpty() || password.isEmpty()) {
+            error.setText(errorText);
+        } else {
+            String userRole = DB.getUserRole(username, password);
+            if (userRole != null) {
+            	
+                error.setText("Login successful!");
+
+                switch (userRole) {
+                    case "admin":
+                        openAdminPanel();
+                        break;
+                    case "user":
+                    	generateInvoice();
+                        break;
+                    default:
+                        error.setText("Unknown user role");
+                        break;
+                }
+            } else {
+                error.setText(errorText);
+            }
+        }
+    }
+
+    private void openAdminPanel() {
+        AdminPanel adminPanel = new AdminPanel();
+        adminPanel.setVisible(true);
+        dispose(); 
+    }
+
+    private void generateInvoice() {
+        generateInvoice g = new generateInvoice();
+        g.setVisible(true);
+        dispose(); 
+    }
+	
+
 	public static String getMac()
 	{
 		InetAddress ip;
